@@ -1,32 +1,6 @@
 # Migration Guide
 
-## Version `_________`
 
-- All implementations of the `AbstractUserController` should be checked to see whether one of the methods `findById`, `updateObject`, `update`, `delete` or, `terminate` have been overwritten. If this is the case, the method signature must be adapted to the use of specifications. 
-
-Example:
-```java
-/* old implementation */
-@Override
-@GetMapping("/{id}")
-@Secured(BasicApplicationRight.Authority.USER_READ)
-@Operation(summary = "Retrieve a user by her id")
-public UserRepresentation findById(@PathVariable("id") @NotNull Long id) {
-    // do something
-      super.findById(id);
-}
-
-/* new implementation */
-@Override
-@GetMapping("/{id}")
-@Secured(BasicApplicationRight.Authority.USER_READ)
-@Operation(summary = "Retrieve a user by her id")
-public UserRepresentation findById(@PathVariable("id") @NotNull Long id,
-                                   @Parameter(hidden = true) @Spec(path = "id", pathVars = "id", spec = Equal.class) UserSpec spec) {
-    // do something
-    super.findById(id, spec);
-}
-```
 
 ## Version `2.6.0`
 
@@ -128,6 +102,7 @@ public RightInitializer(RightService rightService, RoleRepository roleRepository
   super(rightService, roleRepository);
 }
 ```
+
 ## Version `2.5.4`
 
 If `@Validated` is used, parameter annotations such as `@Email` or `@NotNull` are evaluated and violations result in a `HandlerMethodValidationException`. Since Spring Boot 3.2.2, only the error message `"Validation failure"` is output by default. Essencium therefore implements its own handler that outputs the embedded violations as an error message. Assuming that the parameter `eMail` is incorrect and the mandatory parameter `lastName` is not transmitted at all, the resulting error message is as follows:
